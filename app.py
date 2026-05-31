@@ -25,8 +25,16 @@ st.markdown("""
     .soh-critical {
         background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
     }
-    .soh-warning {
-        background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+    .info-btn {
+        background: none;
+        border: none;
+        color: #667eea;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    .info-btn:hover {
+        color: #764ba2;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -70,15 +78,50 @@ except Exception as e:
 
 st.subheader("📝 Battery Parameters Input")
 
+# Fungsi untuk bikin info popup
+def info_button(param_name, description):
+    if st.button("ℹ️", key=param_name, help=description):
+        st.toast(f"📌 {description}", icon="ℹ️")
+
 col1, col2 = st.columns(2)
 
 with col1:
-    cycle = st.number_input("Aging Cycle", min_value=0, max_value=2000, value=100, step=10)
-    soc = st.number_input("State of Charge SOC (%)", min_value=0, max_value=100, value=80, step=5)
+    # Aging Cycle dengan tombol info
+    cycle_label, cycle_info = st.columns([4, 1])
+    with cycle_label:
+        st.markdown("**🔄 Aging Cycle**")
+    with cycle_info:
+        st.button("ℹ️", key="info_cycle", help="Jumlah siklus charge-discharge yang sudah dilalui baterai. Rentang: 0 - 2000 cycle.")
+    
+    cycle = st.number_input("", min_value=0, max_value=2000, value=100, step=10, key="cycle_input", label_visibility="collapsed")
+    
+    # SOC dengan tombol info
+    soc_label, soc_info = st.columns([4, 1])
+    with soc_label:
+        st.markdown("**🔋 SOC (%)**")
+    with soc_info:
+        st.button("ℹ️", key="info_soc", help="State of Charge - Level persentase pengisian baterai saat ini. Normal: 20% - 80%.")
+    
+    soc = st.number_input("", min_value=0, max_value=100, value=80, step=5, key="soc_input", label_visibility="collapsed")
 
 with col2:
-    r_int = st.number_input("Internal Resistance R_int (%)", min_value=0, max_value=200, value=10, step=5)
-    ocv = st.number_input("Open Circuit Voltage OCV (V)", min_value=3.0, max_value=4.5, value=4.1, step=0.05)
+    # R_int dengan tombol info
+    rint_label, rint_info = st.columns([4, 1])
+    with rint_label:
+        st.markdown("**⚡ R_int (%)**")
+    with rint_info:
+        st.button("ℹ️", key="info_rint", help="Internal Resistance - Resistansi internal baterai. Naik >100% menandakan degradasi.")
+    
+    r_int = st.number_input("", min_value=0, max_value=200, value=10, step=5, key="rint_input", label_visibility="collapsed")
+    
+    # OCV dengan tombol info
+    ocv_label, ocv_info = st.columns([4, 1])
+    with ocv_label:
+        st.markdown("**🔌 OCV (V)**")
+    with ocv_info:
+        st.button("ℹ️", key="info_ocv", help="Open Circuit Voltage - Tegangan baterai saat tidak dibebani. Sehat: >3.8V.")
+    
+    ocv = st.number_input("", min_value=3.0, max_value=4.5, value=4.1, step=0.05, key="ocv_input", label_visibility="collapsed")
 
 if st.button("🔮 Predict Battery Health", type="primary", use_container_width=True):
     input_data = np.array([[cycle, soc, r_int, ocv]])
